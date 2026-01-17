@@ -3,4 +3,4 @@ pynput
 pyperclip
 pillow
 pyautogui
-pyinstaller
+pystray

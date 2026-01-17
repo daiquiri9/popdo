@@ -1,7 +1,29 @@
 import threading
 import time
+from PIL import Image, ImageDraw
+import pystray
 from monitor import SelectionMonitor
 from ui import PopDoBar
+
+def create_icon():
+    # Generate a simple icon with an initial
+    width = 64
+    height = 64
+    image = Image.new('RGB', (width, height), color=(43, 43, 43))
+    dc = ImageDraw.Draw(image)
+    dc.rectangle([16, 16, 48, 48], fill=(62, 126, 230))
+    return image
+
+def run_tray(app, monitor):
+    def on_quit(icon, item):
+        icon.stop()
+        app.quit()
+        # monitor.stop() is called in finally block of main
+
+    icon = pystray.Icon("PopDo", create_icon(), "PopDo", menu=pystray.Menu(
+        pystray.MenuItem("Quit", on_quit)
+    ))
+    icon.run()
 
 def main():
     # Initialize UI
@@ -16,6 +38,10 @@ def main():
     monitor = SelectionMonitor(on_selection_detected)
     monitor.start()
     
+    # Start Tray Icon in background thread
+    tray_thread = threading.Thread(target=run_tray, args=(app, monitor), daemon=True)
+    tray_thread.start()
+
     # Run UI Loop
     try:
         app.mainloop()
