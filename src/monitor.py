@@ -6,8 +6,9 @@ from pynput import mouse
 from pynput.keyboard import Key, Controller
 
 class SelectionMonitor:
-    def __init__(self, on_selection_callback):
+    def __init__(self, on_selection_callback, on_any_click_callback=None):
         self.on_selection = on_selection_callback
+        self.on_any_click = on_any_click_callback
         self.keyboard = Controller()
         self.mouse_listener = None
         self.start_pos = None
@@ -36,6 +37,8 @@ class SelectionMonitor:
             return
 
         if pressed:
+            if self.on_any_click:
+                self.on_any_click(x, y)
             self.start_pos = (x, y)
         else:
             is_drag = False

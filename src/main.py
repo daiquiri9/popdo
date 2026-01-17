@@ -34,8 +34,12 @@ def main():
         # Schedule UI update on main thread
         app.after(0, lambda: app.show_at(text, x, y))
 
+    def on_global_click(x, y):
+        # Handle click on main thread
+        app.after(0, lambda: app.handle_external_click(x, y))
+
     # Initialize Monitor
-    monitor = SelectionMonitor(on_selection_detected)
+    monitor = SelectionMonitor(on_selection_detected, on_global_click)
     monitor.start()
     
     # Start Tray Icon in background thread

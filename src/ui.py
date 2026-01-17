@@ -79,10 +79,27 @@ class PopDoBar(ctk.CTk):
         
         self.deiconify()
         self.lift()
-        self.focus_force() # Grab focus so we can detect FocusOut
+        # self.focus_force() # Removed to prevent stealing focus from text editor
         
         # Reset hide timer if exists
         self._cancel_timer()
+
+    def handle_external_click(self, x, y):
+        if self.state() == "withdrawn":
+            return
+
+        # Check if click is inside the window
+        wx = self.winfo_rootx()
+        wy = self.winfo_rooty()
+        ww = self.winfo_width()
+        wh = self.winfo_height()
+
+        if wx <= x <= wx + ww and wy <= y <= wy + wh:
+            # Inside, do nothing (let button click handle it)
+            return
+        
+        # Outside, hide
+        self.hide()
 
     def hide(self):
         self.withdraw()
