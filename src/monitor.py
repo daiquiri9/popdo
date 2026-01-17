@@ -86,9 +86,8 @@ class SelectionMonitor:
         # but let's at least grab the new text.
         
         try:
-            # Clear clipboard first to detect change? 
-            # Or just copy and see if it is text.
-            # safe approach: copy, read.
+            # Get current clipboard content
+            old_text = pyperclip.paste()
             
             # Send Ctrl+C
             with self.keyboard.pressed(Key.ctrl):
@@ -98,13 +97,16 @@ class SelectionMonitor:
             # Tiny wait for clipboard to update
             time.sleep(0.1)
             
-            text = pyperclip.paste()
-            text = text.strip()
+            new_text = pyperclip.paste()
+            new_text = new_text.strip()
             
-            if text:
+            # Only trigger if text changed and is valid
+            # This prevents window dragging (which triggers Ctrl+C but doesn't change clipboard)
+            # from showing the popup with old clipboard data.
+            if new_text and new_text != old_text:
                 # Valid text found, trigger UI
                 # We pass the mouse position to spawn the window there
-                self.on_selection(text, mouse_x, mouse_y)
+                self.on_selection(new_text, mouse_x, mouse_y)
                 
         except Exception as e:
             print(f"Error checking selection: {e}")
